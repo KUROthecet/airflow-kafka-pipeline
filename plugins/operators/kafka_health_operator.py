@@ -1,13 +1,4 @@
-"""
-KafkaHealthOperator - Custom Airflow Operator for Kafka broker health checks.
 
-Checks:
-  1. TCP connectivity to each broker
-  2. Topic availability on the cluster
-  3. Consumer group lag (optional)
-
-Pushes health status to XCom for downstream branching.
-"""
 
 import logging
 import socket
@@ -19,20 +10,7 @@ from airflow.plugins_manager import AirflowPlugin
 
 log = logging.getLogger(__name__)
 
-
 class KafkaHealthOperator(BaseOperator):
-    """
-    Custom operator to perform a full Kafka health check.
-
-    Args:
-        kafka_conn_id (str): Airflow Connection ID for Kafka.
-        brokers (list[str]): List of "host:port" broker strings to TCP-check.
-            If None, reads from the Connection extras.
-        topic (str): Kafka topic to verify existence.
-        consumer_group_id (str): Consumer group to check lag (optional).
-        lag_threshold (int): Max acceptable consumer lag before raising alert.
-        timeout (int): TCP socket timeout in seconds.
-    """
 
     template_fields: Sequence[str] = ("topic",)
     ui_color = "#f0e4d4"
@@ -57,7 +35,7 @@ class KafkaHealthOperator(BaseOperator):
         self.timeout = timeout
 
     def _check_tcp(self, host: str, port: int) -> bool:
-        """Return True if TCP connection to host:port succeeds."""
+        
         try:
             with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
                 sock.settimeout(self.timeout)
@@ -68,7 +46,7 @@ class KafkaHealthOperator(BaseOperator):
             return False
 
     def _parse_brokers(self, brokers_str: str) -> List[tuple]:
-        """Parse 'host:port,...' string into list of (host, port) tuples."""
+        
         pairs = []
         for entry in brokers_str.split(","):
             entry = entry.strip()
@@ -81,11 +59,7 @@ class KafkaHealthOperator(BaseOperator):
         return pairs
 
     def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Run the full health check suite.
-
-        Returns a health report dict, also pushed to XCom.
-        """
+        
         from plugins.hooks.kafka_hook import KafkaHook
 
         hook = KafkaHook(kafka_conn_id=self.kafka_conn_id)
@@ -150,7 +124,6 @@ class KafkaHealthOperator(BaseOperator):
 
         log.info("Kafka health check complete. Healthy: %s", report["overall_healthy"])
         return report
-
 
 class KafkaHealthOperatorPlugin(AirflowPlugin):
     name = "kafka_health_operator_plugin"

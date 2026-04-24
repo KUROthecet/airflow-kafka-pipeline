@@ -1,9 +1,4 @@
-"""
-KafkaTopicSensor - Custom Airflow Sensor to wait for messages in a Kafka topic.
 
-Periodically polls the topic and returns True when at least one
-new message is available since the last checked offset.
-"""
 
 import logging
 from typing import Any, Dict, Sequence
@@ -13,16 +8,7 @@ from airflow.plugins_manager import AirflowPlugin
 
 log = logging.getLogger(__name__)
 
-
 class KafkaTopicSensor(BaseSensorOperator):
-    """
-    Waits for at least one new message on a Kafka topic.
-
-    Args:
-        kafka_conn_id (str): Airflow Connection ID for Kafka.
-        topic (str): Kafka topic to monitor.
-        consumer_group_id (str): Consumer group to use for offset tracking.
-    """
 
     template_fields: Sequence[str] = ("topic",)
     ui_color = "#f0d4e4"
@@ -41,7 +27,7 @@ class KafkaTopicSensor(BaseSensorOperator):
         self.consumer_group_id = consumer_group_id
 
     def poke(self, context: Dict[str, Any]) -> bool:
-        """Poll Kafka for new messages."""
+        
         from plugins.hooks.kafka_hook import KafkaHook
 
         hook = KafkaHook(kafka_conn_id=self.kafka_conn_id)
@@ -79,7 +65,6 @@ class KafkaTopicSensor(BaseSensorOperator):
             return False
         finally:
             consumer.close()
-
 
 class KafkaTopicSensorPlugin(AirflowPlugin):
     name = "kafka_topic_sensor_plugin"

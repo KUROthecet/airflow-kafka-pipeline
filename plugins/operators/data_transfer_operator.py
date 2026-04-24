@@ -1,12 +1,4 @@
-"""
-DataTransferOperator - Transfers messages from a Kafka topic to a staging CSV file.
 
-Features:
-  - Configurable batch size
-  - Checkpointing (last-consumed offset saved to XCom)
-  - Progress tracking per partition
-  - Partial-failure handling (skips bad messages, logs errors)
-"""
 
 import csv
 import json
@@ -20,19 +12,7 @@ from airflow.plugins_manager import AirflowPlugin
 
 log = logging.getLogger(__name__)
 
-
 class DataTransferOperator(BaseOperator):
-    """
-    Consume messages from a Kafka topic and save them to a staging CSV.
-
-    Args:
-        kafka_conn_id (str): Airflow Connection ID for Kafka.
-        topic (str): Kafka topic to consume from.
-        staging_path (str): Directory path where CSV files are written.
-        batch_size (int): Maximum number of messages to consume per run.
-        consumer_group_id (str): Kafka consumer group ID.
-        timeout_ms (int): Consumer poll timeout in milliseconds.
-    """
 
     template_fields: Sequence[str] = ("topic", "staging_path")
     ui_color = "#d4f0e4"
@@ -65,7 +45,7 @@ class DataTransferOperator(BaseOperator):
         return os.path.join(self.staging_path, filename)
 
     def _parse_message(self, raw_value: bytes) -> Optional[Dict[str, Any]]:
-        """Attempt to parse a Kafka message value as JSON."""
+        
         try:
             return json.loads(raw_value.decode("utf-8"))
         except (json.JSONDecodeError, UnicodeDecodeError) as exc:
@@ -73,7 +53,7 @@ class DataTransferOperator(BaseOperator):
             return None
 
     def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Consume up to batch_size messages and write to CSV."""
+        
         from plugins.hooks.kafka_hook import KafkaHook
 
         self._ensure_staging_dir()
@@ -157,7 +137,6 @@ class DataTransferOperator(BaseOperator):
 
         log.info("DataTransferOperator complete: %s", report)
         return report
-
 
 class DataTransferOperatorPlugin(AirflowPlugin):
     name = "data_transfer_operator_plugin"

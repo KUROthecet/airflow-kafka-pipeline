@@ -1,12 +1,4 @@
-"""
-SparkJobOperator - Custom operator to submit and monitor Apache Spark jobs.
 
-Wraps SparkSubmitOperator with:
-  - Job status tracking via XCom
-  - Resource configuration
-  - Timeout handling
-  - Cleanup on failure
-"""
 
 import logging
 from typing import Any, Dict, List, Optional, Sequence
@@ -16,25 +8,7 @@ from airflow.plugins_manager import AirflowPlugin
 
 log = logging.getLogger(__name__)
 
-
 class SparkJobOperator(BaseOperator):
-    """
-    Submit a Spark job via spark-submit and track its status.
-
-    Args:
-        application (str): Path to the Spark application script or JAR.
-        conn_id (str): Airflow Spark connection ID.
-        application_args (list): Arguments passed to the Spark application.
-        driver_memory (str): Driver memory e.g. "1g".
-        executor_memory (str): Executor memory e.g. "2g".
-        executor_cores (int): Number of cores per executor.
-        num_executors (int): Number of executors.
-        name (str): Spark application name.
-        verbose (bool): Enable verbose logging from spark-submit.
-        packages (list[str]): Maven packages to include (e.g. kafka connector).
-        conf (dict): Extra Spark configuration key-value pairs.
-        timeout (int): Job timeout in seconds (0 = no timeout).
-    """
 
     template_fields: Sequence[str] = ("application", "application_args")
     ui_color = "#e4d4f0"
@@ -71,7 +45,7 @@ class SparkJobOperator(BaseOperator):
         self.timeout = timeout
 
     def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Submit the Spark job and track its execution."""
+        
         from airflow.providers.apache.spark.operators.spark_submit import (
             SparkSubmitOperator,
         )
@@ -130,10 +104,9 @@ class SparkJobOperator(BaseOperator):
         return job_report
 
     def _cleanup(self, context: Dict[str, Any]) -> None:
-        """Perform cleanup on job failure (e.g. remove temp checkpoints)."""
+        
         log.info("SparkJobOperator._cleanup: running post-failure cleanup...")
         log.info("Cleanup complete.")
-
 
 class SparkJobOperatorPlugin(AirflowPlugin):
     name = "spark_job_operator_plugin"

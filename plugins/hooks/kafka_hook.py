@@ -1,10 +1,4 @@
-"""
-KafkaHook - Custom Airflow Hook for Kafka connections.
 
-Provides a reusable interface to connect to Kafka brokers
-using SASL_PLAINTEXT authentication, reading connection
-parameters from an Airflow Connection object.
-"""
 
 import logging
 from typing import Any, Dict, List, Optional
@@ -14,21 +8,7 @@ from airflow.plugins_manager import AirflowPlugin
 
 log = logging.getLogger(__name__)
 
-
 class KafkaHook(BaseHook):
-    """
-    Hook for connecting to a Kafka cluster.
-
-    Reads broker address, security protocol, SASL credentials
-    from the Airflow Connection identified by ``kafka_conn_id``.
-
-    Connection extras expected (JSON):
-        - bootstrap_servers  (str)  e.g. "host:9094,host:9194"
-        - security_protocol  (str)  e.g. "SASL_PLAINTEXT"
-        - sasl_mechanism     (str)  e.g. "PLAIN"
-        - sasl_username      (str)
-        - sasl_password      (str)
-    """
 
     conn_name_attr = "kafka_conn_id"
     default_conn_name = "kafka_default"
@@ -41,7 +21,7 @@ class KafkaHook(BaseHook):
         self._config: Optional[Dict[str, Any]] = None
 
     def get_conn(self) -> Dict[str, Any]:
-        """Return Kafka client configuration dict."""
+        
         if self._config is not None:
             return self._config
 
@@ -73,7 +53,7 @@ class KafkaHook(BaseHook):
         return self._config
 
     def get_admin_client(self):
-        """Return a kafka-python KafkaAdminClient using this hook's config."""
+        
         from kafka import KafkaAdminClient
 
         cfg = self.get_conn()
@@ -87,7 +67,7 @@ class KafkaHook(BaseHook):
         )
 
     def get_consumer(self, topic: str, group_id: str = "airflow-consumer", **kwargs):
-        """Return a KafkaConsumer for the given topic."""
+        
         from kafka import KafkaConsumer
 
         cfg = self.get_conn()
@@ -106,7 +86,7 @@ class KafkaHook(BaseHook):
         )
 
     def list_topics(self) -> List[str]:
-        """Return list of all topics on the Kafka cluster."""
+        
         admin = self.get_admin_client()
         try:
             topics = list(admin.list_topics())
@@ -116,11 +96,11 @@ class KafkaHook(BaseHook):
             admin.close()
 
     def topic_exists(self, topic: str) -> bool:
-        """Return True if the given topic exists on the cluster."""
+        
         return topic in self.list_topics()
 
     def get_consumer_group_offsets(self, group_id: str, topic: str) -> Dict[str, Any]:
-        """Return current offsets for a consumer group on a topic."""
+        
         from kafka import KafkaAdminClient, TopicPartition
 
         cfg = self.get_conn()
@@ -141,7 +121,6 @@ class KafkaHook(BaseHook):
             return result
         finally:
             admin.close()
-
 
 class KafkaHookPlugin(AirflowPlugin):
     name = "kafka_hook_plugin"
