@@ -1,0 +1,14 @@
+{
+  "kafka_default": {
+    "conn_type": "kafka",
+    "host": "",
+    "login": "",
+    "password": "",
+    "extra": "{\"bootstrap_servers\": \"46.202.167.130:9094,46.202.167.130:9194,46.202.167.130:9294\", \"security_protocol\": \"SASL_PLAINTEXT\", \"sasl_mechanism\": \"PLAIN\", \"sasl_username\": \"kafka\", \"sasl_password\": \"UnigapKafka@2024\"}"
+  },
+  "spark_default": {
+    "conn_type": "spark",
+    "host": "local[*]",
+    "extra": "{}"
+  }
+}

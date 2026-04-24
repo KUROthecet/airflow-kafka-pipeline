@@ -1,0 +1,14 @@
+logs/
+*.log
+airflow-webserver.pid
+staging/
+staging/archive/
+staging/reports/
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.DS_Store
+Thumbs.db
+.env

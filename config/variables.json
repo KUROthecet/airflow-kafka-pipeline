@@ -1,0 +1,7 @@
+{
+  "kafka_topic": "product_view",
+  "staging_path": "/opt/airflow/staging",
+  "batch_size": 5000,
+  "retention_days_staging": 7,
+  "retention_days_archive": 30
+}
