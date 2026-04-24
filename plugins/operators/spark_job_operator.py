@@ -85,7 +85,6 @@ class SparkJobOperator(BaseOperator):
             self.application,
         )
 
-        # Build extra conf
         spark_conf = {
             "spark.sql.shuffle.partitions": "8",
             "spark.driver.extraJavaOptions": "-Dfile.encoding=UTF-8",
@@ -133,8 +132,6 @@ class SparkJobOperator(BaseOperator):
     def _cleanup(self, context: Dict[str, Any]) -> None:
         """Perform cleanup on job failure (e.g. remove temp checkpoints)."""
         log.info("SparkJobOperator._cleanup: running post-failure cleanup...")
-        # Add specific cleanup logic here if needed
-        # e.g., delete partial output files, reset offsets
         log.info("Cleanup complete.")
 
 

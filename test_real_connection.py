@@ -1,13 +1,11 @@
 import os
 import sys
 
-# Ensure utf-8 encoding for stdout
 sys.stdout.reconfigure(encoding='utf-8')
 
 from kafka import KafkaAdminClient
 from kafka.errors import KafkaError
 
-# Real Kafka Connection Details
 bootstrap_servers = '46.202.167.130:9094,46.202.167.130:9194,46.202.167.130:9294'
 security_protocol = 'SASL_PLAINTEXT'
 sasl_mechanism = 'PLAIN'

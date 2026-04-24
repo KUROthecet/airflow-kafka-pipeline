@@ -46,7 +46,6 @@ class KafkaTopicSensor(BaseSensorOperator):
 
         hook = KafkaHook(kafka_conn_id=self.kafka_conn_id)
         
-        # Check if topic exists first
         if not hook.topic_exists(self.topic):
             log.warning("Topic '%s' does not exist yet.", self.topic)
             return False
@@ -59,7 +58,6 @@ class KafkaTopicSensor(BaseSensorOperator):
         )
 
         try:
-            # Try to fetch one message
             msg_batch = consumer.poll(timeout_ms=2000, max_records=1)
             
             has_messages = False

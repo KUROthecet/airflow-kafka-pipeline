@@ -101,7 +101,6 @@ class DataTransferOperator(BaseOperator):
             for message in consumer:
                 parsed = self._parse_message(message.value)
                 if parsed is not None:
-                    # Flatten nested dicts one level
                     flat = {}
                     for k, v in parsed.items():
                         if isinstance(v, dict):
@@ -114,7 +113,6 @@ class DataTransferOperator(BaseOperator):
                     flat["_kafka_timestamp"] = message.timestamp
                     records.append(flat)
 
-                    # Track checkpoint
                     partition_key = f"{self.topic}-{message.partition}"
                     offsets[partition_key] = message.offset
                 else:
@@ -133,7 +131,6 @@ class DataTransferOperator(BaseOperator):
         finally:
             consumer.close()
 
-        # Write CSV
         record_count = len(records)
         if records:
             fieldnames = list(records[0].keys())
@@ -145,7 +142,6 @@ class DataTransferOperator(BaseOperator):
         else:
             log.warning("No records consumed. Empty CSV will not be created.")
 
-        # Build transfer report
         report = {
             "topic": self.topic,
             "records_transferred": record_count,

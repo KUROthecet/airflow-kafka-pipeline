@@ -91,7 +91,6 @@ class KafkaHealthOperator(BaseOperator):
         hook = KafkaHook(kafka_conn_id=self.kafka_conn_id)
         cfg = hook.get_conn()
 
-        # Resolve brokers list
         broker_list = self.brokers or self._parse_brokers(cfg["bootstrap_servers"])
 
         report: Dict[str, Any] = {
@@ -101,7 +100,6 @@ class KafkaHealthOperator(BaseOperator):
             "overall_healthy": True,
         }
 
-        # 1. TCP connectivity check
         all_brokers_up = True
         for host, port in broker_list:
             is_up = self._check_tcp(host, port)
@@ -114,7 +112,6 @@ class KafkaHealthOperator(BaseOperator):
             report["overall_healthy"] = False
             log.warning("One or more Kafka brokers are unreachable.")
 
-        # 2. Topic availability check
         try:
             report["topic_available"] = hook.topic_exists(self.topic)
             if not report["topic_available"]:
@@ -127,7 +124,6 @@ class KafkaHealthOperator(BaseOperator):
             report["topic_available"] = False
             report["overall_healthy"] = False
 
-        # 3. Consumer group lag check
         try:
             offsets = hook.get_consumer_group_offsets(
                 self.consumer_group_id, self.topic
@@ -148,7 +144,6 @@ class KafkaHealthOperator(BaseOperator):
             log.warning("Could not fetch consumer group offsets: %s", exc)
             report["consumer_lag"] = {}
 
-        # Push report to XCom
         ti = context["ti"]
         ti.xcom_push(key="health_report", value=report)
         ti.xcom_push(key="is_healthy", value=report["overall_healthy"])
